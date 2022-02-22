@@ -1,20 +1,27 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React from "react";
+import { StyleSheet, View, Text } from "react-native";
+import AddCategory from "./src/addCategory";
+import AddExpense from "./src/addExpense";
+import AddIncome from "./src/addIncome";
+import Dashboard from "./src/dashboard";
+import NinthPage from "./src/db";
 
-export default function App() {
+const Stack = createNativeStackNavigator();
+
+function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Dashboard" component={Dashboard} />
+        <Stack.Screen name="Add Category" component={AddCategory} />
+        <Stack.Screen name="Add Income" component={AddIncome} />
+        <Stack.Screen name="Add Expense" component={AddExpense} />
+        {/* <Stack.Screen name="Add Expense" component={NinthPage} /> */}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
