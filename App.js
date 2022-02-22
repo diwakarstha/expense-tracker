@@ -6,7 +6,7 @@ import AddCategory from "./src/addCategory";
 import AddExpense from "./src/addExpense";
 import AddIncome from "./src/addIncome";
 import Dashboard from "./src/dashboard";
-import NinthPage from "./src/db";
+import ViewRecords from "./src/viewRecords";
 
 const Stack = createNativeStackNavigator();
 
@@ -18,7 +18,7 @@ function App() {
         <Stack.Screen name="Add Category" component={AddCategory} />
         <Stack.Screen name="Add Income" component={AddIncome} />
         <Stack.Screen name="Add Expense" component={AddExpense} />
-        {/* <Stack.Screen name="Add Expense" component={NinthPage} /> */}
+        <Stack.Screen name="View Records" component={ViewRecords} />
       </Stack.Navigator>
     </NavigationContainer>
   );

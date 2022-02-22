@@ -52,8 +52,13 @@ export default function AddExpense({ navigation }) {
               try {
                 await db.transaction(async (tx) => {
                   await tx.executeSql(
-                    "INSERT INTO Records (Type, CategoryId, Amount) VALUES (?,?,?)",
-                    ["expense", selectedValue, amount]
+                    "INSERT INTO Records (Type, CategoryId, CategoryName, Amount) VALUES (?,?,?,?)",
+                    [
+                      "expense",
+                      selectedValue,
+                      results.rows.item(0).Name,
+                      amount,
+                    ]
                   );
                 });
                 await db.transaction(async (tx) => {

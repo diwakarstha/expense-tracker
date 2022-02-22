@@ -53,8 +53,8 @@ export default function AddIncome({ navigation }) {
               try {
                 await db.transaction(async (tx) => {
                   await tx.executeSql(
-                    "INSERT INTO Records (Type, CategoryId, Amount) VALUES (?,?,?)",
-                    ["income", selectedValue, amount]
+                    "INSERT INTO Records (Type, CategoryId, CategoryName, Amount) VALUES (?,?,?,?)",
+                    ["income", selectedValue, results.rows.item(0).Name, amount]
                   );
                 });
 

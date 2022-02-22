@@ -85,10 +85,9 @@ export default function AddCategory({ navigation }) {
         style={({ pressed }) =>
           pressed ? styles.buttonPressed : styles.button
         }
+        onPress={onPressHandle}
       >
-        <Text style={styles.buttonText} onPress={onPressHandle}>
-          Confirm
-        </Text>
+        <Text style={styles.buttonText}>Confirm</Text>
       </Pressable>
     </View>
   );

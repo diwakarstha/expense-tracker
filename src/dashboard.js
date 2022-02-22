@@ -1,6 +1,6 @@
 import react, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { Button, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Button, Pressable, StyleSheet, Text, View } from "react-native";
 import NavigateButton from "./common/navigateBotton";
 import Test from "./test";
 import { createTables, db } from "./db";
@@ -10,7 +10,6 @@ import { useIsFocused } from "@react-navigation/native";
 export default function Dashboard({ navigation }) {
   const [categories, setCategories] = useState();
   const [totalBalance, setTotalBalance] = useState();
-  const [records, setRecords] = useState();
 
   const isFocused = useIsFocused();
 
@@ -20,7 +19,6 @@ export default function Dashboard({ navigation }) {
     //   tx.executeSql("DROP TABLE Records");
     // });
     readCategories();
-    // readRecords();
   }, [isFocused]);
 
   const calculateTotalBalance = (list) => {
@@ -55,36 +53,32 @@ export default function Dashboard({ navigation }) {
     }
   };
 
-  // const readRecords = () => {
-  //   createTables();
-  //   const resultRecords = [];
-  //   try {
-  //     db.transaction((tx) => {
-  //       tx.executeSql("SELECT * FROM Records", [], (tx, results) => {
-  //         var len = results.rows.length;
-  //         // console.log(len);
-  //         if (len > 0) {
-  //           for (let i = 0; i < len; i++) {
-  //             resultRecords.push(results.rows.item(i));
-  //           }
-  //           setRecords(resultRecords);
-  //         }
-  //       });
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
   const onPressDelete = (categoryId) => {
     try {
       db.transaction((tx) => {
         tx.executeSql(
-          "DELETE FROM Categories WHERE ID='" + categoryId + "'",
-          []
+          "SELECT * FROM Records WHERE CategoryId='" + categoryId + "' ",
+          [],
+          (tx, results) => {
+            if (results.rows.length > 0) {
+              Alert.alert("Warning!", "Can't delete category contains records");
+            } else {
+              try {
+                db.transaction((tx) => {
+                  tx.executeSql(
+                    "DELETE FROM Categories WHERE ID='" + categoryId + "'",
+                    []
+                  );
+                });
+                setCategories();
+                readCategories();
+              } catch (error) {
+                console.log(error);
+              }
+            }
+          }
         );
       });
-      readCategories();
     } catch (error) {
       console.log(error);
     }
@@ -116,12 +110,12 @@ export default function Dashboard({ navigation }) {
                   style={{
                     borderWidth: 2,
                     borderRadius: 20,
-                    borderColor: "blue",
+                    borderColor: "red",
                     padding: 5,
                   }}
                   onPress={() => onPressDelete(category.ID)}
                 >
-                  <Text style={{ color: "blue" }}>Delete</Text>
+                  <Text style={{ color: "red" }}>Delete</Text>
                 </Pressable>
               </View>
             );
@@ -145,6 +139,11 @@ export default function Dashboard({ navigation }) {
         navigation={navigation}
         buttonName="Add Expense"
         pageToNavigate="Add Expense"
+      />
+      <NavigateButton
+        navigation={navigation}
+        buttonName="View Records"
+        pageToNavigate="View Records"
       />
     </ScrollView>
   );
