@@ -1,6 +1,14 @@
 import react, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { Alert, Button, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  Button,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import NavigateButton from "./common/navigateBotton";
 import Test from "./test";
 import { createTables, db } from "./db";

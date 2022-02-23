@@ -6,10 +6,13 @@ import Test from "./test";
 import { createTables, db } from "./db";
 import { ScrollView } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
+import NavigateButtonSuccess from "./common/navigateButtonSuccess";
+import NavigateButtonDanger from "./common/navigateButtonDanger";
 
 export default function Dashboard({ navigation }) {
   const [categories, setCategories] = useState();
   const [totalBalance, setTotalBalance] = useState();
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   const isFocused = useIsFocused();
 
@@ -63,18 +66,28 @@ export default function Dashboard({ navigation }) {
             if (results.rows.length > 0) {
               Alert.alert("Warning!", "Can't delete category contains records");
             } else {
-              try {
-                db.transaction((tx) => {
-                  tx.executeSql(
-                    "DELETE FROM Categories WHERE ID='" + categoryId + "'",
-                    []
-                  );
-                });
-                setCategories();
-                readCategories();
-              } catch (error) {
-                console.log(error);
-              }
+              Alert.alert("Warning!", "Are you sure, confirm delete?", [
+                {
+                  text: "Yes",
+                  onPress: () => {
+                    try {
+                      db.transaction((tx) => {
+                        tx.executeSql(
+                          "DELETE FROM Categories WHERE ID='" +
+                            categoryId +
+                            "'",
+                          []
+                        );
+                      });
+                      setCategories();
+                      readCategories();
+                    } catch (error) {
+                      console.log(error);
+                    }
+                  },
+                },
+                { text: "No", onPress: () => {} },
+              ]);
             }
           }
         );
@@ -130,12 +143,12 @@ export default function Dashboard({ navigation }) {
         />
       </View>
 
-      <NavigateButton
+      <NavigateButtonSuccess
         navigation={navigation}
         buttonName="Add Income"
         pageToNavigate="Add Income"
       />
-      <NavigateButton
+      <NavigateButtonDanger
         navigation={navigation}
         buttonName="Add Expense"
         pageToNavigate="Add Expense"
@@ -145,6 +158,9 @@ export default function Dashboard({ navigation }) {
         buttonName="View Records"
         pageToNavigate="View Records"
       />
+      <Text style={{ textAlign: "center", marginBottom: 30 }}>
+        Created by Diwa with React-Native
+      </Text>
     </ScrollView>
   );
 }

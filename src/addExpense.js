@@ -6,6 +6,7 @@ import {
   Text,
   Pressable,
   Picker,
+  Alert,
 } from "react-native";
 import { createTables, db } from "./db";
 
@@ -40,48 +41,52 @@ export default function AddExpense({ navigation }) {
   };
 
   const onPressConfirm = () => {
-    try {
-      db.transaction((tx) => {
-        tx.executeSql(
-          "SELECT * FROM Categories WHERE ID='" + selectedValue + "'",
-          [],
-          async (tx, results) => {
-            if (results.rows.length > 0) {
-              let updatedAmount =
-                parseInt(results.rows.item(0).Balance) - parseInt(amount);
-              try {
-                await db.transaction(async (tx) => {
-                  await tx.executeSql(
-                    "INSERT INTO Records (Type, CategoryId, CategoryName, Amount) VALUES (?,?,?,?)",
-                    [
-                      "expense",
-                      selectedValue,
-                      results.rows.item(0).Name,
-                      amount,
-                    ]
-                  );
-                });
-                await db.transaction(async (tx) => {
-                  await tx.executeSql(
-                    "UPDATE Categories SET Balance='" +
-                      updatedAmount +
-                      "' WHERE ID='" +
-                      selectedValue +
-                      "'"
-                  );
-                });
-                navigation.goBack();
-              } catch (error) {
-                console.log(error);
+    if (amount == 0) {
+      Alert.alert("Warning!", "Please enter amount > 0");
+    } else {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "SELECT * FROM Categories WHERE ID='" + selectedValue + "'",
+            [],
+            async (tx, results) => {
+              if (results.rows.length > 0) {
+                let updatedAmount =
+                  parseInt(results.rows.item(0).Balance) - parseInt(amount);
+                try {
+                  await db.transaction(async (tx) => {
+                    await tx.executeSql(
+                      "INSERT INTO Records (Type, CategoryId, CategoryName, Amount) VALUES (?,?,?,?)",
+                      [
+                        "expense",
+                        selectedValue,
+                        results.rows.item(0).Name,
+                        amount,
+                      ]
+                    );
+                  });
+                  await db.transaction(async (tx) => {
+                    await tx.executeSql(
+                      "UPDATE Categories SET Balance='" +
+                        updatedAmount +
+                        "' WHERE ID='" +
+                        selectedValue +
+                        "'"
+                    );
+                  });
+                  navigation.goBack();
+                } catch (error) {
+                  console.log(error);
+                }
+              } else {
+                Alert.alert("Warning!", "Please select vaid category");
               }
-            } else {
-              Alert.alert("Warning!", "Please select vaid category");
             }
-          }
-        );
-      });
-    } catch (error) {
-      console.log(error);
+          );
+        });
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -131,12 +136,22 @@ export default function AddExpense({ navigation }) {
           Amount:
         </Text>
         <TextInput
-          style={{
-            fontSize: 20,
-            borderWidth: 1,
-            borderRadius: 10,
-            padding: 10,
-          }}
+          style={
+            selectedValue === "default"
+              ? {
+                  fontSize: 20,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  padding: 10,
+                  backgroundColor: "lightgrey",
+                }
+              : {
+                  fontSize: 20,
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  padding: 10,
+                }
+          }
           placeholder="Enter Amount"
           editable={selectedValue === "default" ? false : true}
           onChangeText={setAmount}
@@ -144,11 +159,24 @@ export default function AddExpense({ navigation }) {
       </View>
       <Pressable
         style={({ pressed }) =>
-          pressed ? styles.buttonPressed : styles.button
+          selectedValue === "default"
+            ? styles.buttonDisabled
+            : pressed
+            ? styles.buttonPressed
+            : styles.button
         }
         onPress={onPressConfirm}
+        disabled={selectedValue === "default" ? true : false}
       >
-        <Text style={styles.buttonText}>Confirm</Text>
+        <Text
+          style={
+            selectedValue === "default"
+              ? styles.buttonTextDisabled
+              : styles.buttonText
+          }
+        >
+          Confirm
+        </Text>
       </Pressable>
     </View>
   );
@@ -168,6 +196,15 @@ const styles = StyleSheet.create({
     margin: 20,
     padding: 10,
   },
+  buttonDisabled: {
+    borderWidth: 1,
+    borderColor: "grey",
+    borderRadius: 15,
+    // width: "100%",
+    margin: 20,
+    padding: 10,
+    backgroundColor: "lightgrey",
+  },
   buttonPressed: {
     borderWidth: 1,
     borderColor: "blue",
@@ -179,6 +216,11 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "blue",
+    textAlign: "center",
+    fontSize: 20,
+  },
+  buttonTextDisabled: {
+    color: "grey",
     textAlign: "center",
     fontSize: 20,
   },
